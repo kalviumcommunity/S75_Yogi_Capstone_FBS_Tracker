@@ -20,3 +20,5 @@ FBS Tracker is a football match score tracking application designed to display l
 ## Status
 UI/UX high-fidelity design completed.
 Development will follow in next phases.
+
+This project is part of my Kalvium Capstone submission.
