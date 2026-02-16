@@ -1,0 +1,24 @@
+{
+  "name": "fbs-football-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalviumcommunity/S75_Yogi_Capstone_FBS_Tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kalviumcommunity/S75_Yogi_Capstone_FBS_Tracker/issues"
+  },
+  "homepage": "https://github.com/kalviumcommunity/S75_Yogi_Capstone_FBS_Tracker#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
