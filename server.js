@@ -44,8 +44,8 @@ app.put("/matches/:id", (req, res) => {
 
   match.homeTeam = homeTeam;
   match.awayTeam = awayTeam;
-  match.homeScore = homeScore || 0;
-  match.awayScore = awayScore || 0;
+ match.homeScore = homeScore !== undefined ? homeScore : match.homeScore;
+ match.awayScore = awayScore !== undefined ? awayScore : match.awayScore;
 
   res.status(200).json({ message: "Match updated", data: match });
 });
