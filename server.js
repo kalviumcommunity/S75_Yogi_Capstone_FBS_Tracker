@@ -1,53 +1,61 @@
+const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
+require("dotenv").config();
+
+const Match = require("./models/Match");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+mongoose.connect(process.env.MONGO_URI || "mongodb://localhost/fbs-football-tracker")
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
 app.get("/test", (req, res) => {
   res.json({ message: "GET API working" });
 });
-let matches = [];
 
-app.post("/matches", (req, res) => {
-  const { homeTeam, awayTeam, homeScore, awayScore } = req.body;
+app.post("/matches", async (req, res) => {
+  try {
+    const { homeTeam, awayTeam, homeScore, awayScore } = req.body;
 
-  if (!homeTeam || !awayTeam) {
-    return res.status(400).json({ message: "homeTeam and awayTeam are required" });
+    if (!homeTeam || !awayTeam) {
+      return res.status(400).json({ message: "homeTeam and awayTeam are required" });
+    }
+
+    const newMatch = new Match({ homeTeam, awayTeam, homeScore, awayScore });
+    const savedMatch = await newMatch.save();
+
+    res.status(201).json({ message: "Match created", data: savedMatch });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
-
-  const newMatch = {
-    id: matches.length + 1,
-    homeTeam,
-    awayTeam,
-    homeScore: homeScore || 0,
-    awayScore: awayScore || 0,
-  };
-
-  matches.push(newMatch);
-  res.status(201).json({ message: "Match created", data: newMatch });
 });
-app.put("/matches/:id", (req, res) => {
-  const matchId = parseInt(req.params.id);
-  const match = matches.find((m) => m.id === matchId);
 
-  if (!match) {
-    return res.status(404).json({ message: "Match not found" });
+app.put("/matches/:id", async (req, res) => {
+  try {
+    const { homeTeam, awayTeam, homeScore, awayScore } = req.body;
+
+    if (!homeTeam || !awayTeam) {
+      return res.status(400).json({ message: "homeTeam and awayTeam are required" });
+    }
+
+    const updatedMatch = await Match.findByIdAndUpdate(
+      req.params.id,
+      { homeTeam, awayTeam, homeScore, awayScore },
+      { new: true }
+    );
+
+    if (!updatedMatch) {
+      return res.status(404).json({ message: "Match not found" });
+    }
+
+    res.status(200).json({ message: "Match updated", data: updatedMatch });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
-
-  const { homeTeam, awayTeam, homeScore, awayScore } = req.body;
-
-  if (!homeTeam || !awayTeam) {
-    return res.status(400).json({ message: "homeTeam and awayTeam are required" });
-  }
-
-  match.homeTeam = homeTeam;
-  match.awayTeam = awayTeam;
- match.homeScore = homeScore !== undefined ? homeScore : match.homeScore;
- match.awayScore = awayScore !== undefined ? awayScore : match.awayScore;
-
-  res.status(200).json({ message: "Match updated", data: match });
 });
 
 const PORT = process.env.PORT || 5000;
