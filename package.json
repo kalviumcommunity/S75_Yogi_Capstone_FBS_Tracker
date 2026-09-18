@@ -20,6 +20,8 @@
   "homepage": "https://github.com/kalviumcommunity/S75_Yogi_Capstone_FBS_Tracker#readme",
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^5.2.1"
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.10.1"
   }
 }
