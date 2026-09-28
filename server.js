@@ -17,6 +17,27 @@ app.get("/test", (req, res) => {
   res.json({ message: "GET API working" });
 });
 
+app.get("/matches", async (req, res) => {
+  try {
+    const allMatches = await Match.find();
+    res.status(200).json({ message: "Matches fetched", data: allMatches });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+app.get("/matches/:id", async (req, res) => {
+  try {
+    const match = await Match.findById(req.params.id);
+    if (!match) {
+      return res.status(404).json({ message: "Match not found" });
+    }
+    res.status(200).json({ message: "Match fetched", data: match });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
 app.post("/matches", async (req, res) => {
   try {
     const { homeTeam, awayTeam, homeScore, awayScore } = req.body;
