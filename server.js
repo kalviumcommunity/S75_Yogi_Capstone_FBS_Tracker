@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const Match = require("./models/Match");
+const Team = require("./models/Team");
 
 const app = express();
 app.use(cors());
@@ -17,9 +18,35 @@ app.get("/test", (req, res) => {
   res.json({ message: "GET API working" });
 });
 
+app.post("/teams", async (req, res) => {
+  try {
+    const { name, country } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ message: "name is required" });
+    }
+
+    const newTeam = new Team({ name, country });
+    const savedTeam = await newTeam.save();
+
+    res.status(201).json({ message: "Team created", data: savedTeam });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+app.get("/teams", async (req, res) => {
+  try {
+    const allTeams = await Team.find();
+    res.status(200).json({ message: "Teams fetched", data: allTeams });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
 app.get("/matches", async (req, res) => {
   try {
-    const allMatches = await Match.find();
+    const allMatches = await Match.find().populate("homeTeam").populate("awayTeam");
     res.status(200).json({ message: "Matches fetched", data: allMatches });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -28,7 +55,7 @@ app.get("/matches", async (req, res) => {
 
 app.get("/matches/:id", async (req, res) => {
   try {
-    const match = await Match.findById(req.params.id);
+    const match = await Match.findById(req.params.id).populate("homeTeam").populate("awayTeam");
     if (!match) {
       return res.status(404).json({ message: "Match not found" });
     }
@@ -48,8 +75,9 @@ app.post("/matches", async (req, res) => {
 
     const newMatch = new Match({ homeTeam, awayTeam, homeScore, awayScore });
     const savedMatch = await newMatch.save();
+    const populatedMatch = await savedMatch.populate(["homeTeam", "awayTeam"]);
 
-    res.status(201).json({ message: "Match created", data: savedMatch });
+    res.status(201).json({ message: "Match created", data: populatedMatch });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -67,7 +95,7 @@ app.put("/matches/:id", async (req, res) => {
       req.params.id,
       { homeTeam, awayTeam, homeScore, awayScore },
       { new: true }
-    );
+    ).populate("homeTeam").populate("awayTeam");
 
     if (!updatedMatch) {
       return res.status(404).json({ message: "Match not found" });

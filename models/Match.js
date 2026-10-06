@@ -3,11 +3,13 @@ const mongoose = require("mongoose");
 const matchSchema = new mongoose.Schema(
   {
     homeTeam: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Team",
       required: true,
     },
     awayTeam: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Team",
       required: true,
     },
     homeScore: {
